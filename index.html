@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ViaaStore | Sarqh.Id</title>
+    
+    <!-- Google Analytics -->
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-XXXXX-Y', 'auto');
+        ga('send', 'pageview');
+        
+        function trackCartEvent(action, label) {
+            ga('send', 'event', 'Ecommerce', action, label);
+            console.log(`[GA Track] Event: Ecommerce | Action: ${action} | Label: ${label}`);
+        }
+    </script>
+
+    <style>
+        /* Reset & General Style */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #fff9fa;
+            color: #333;
+            scroll-behavior: smooth;
+        }
+
+        /* Header & Logo */
+        header {
+            background-color: #ffcad4;
+            text-align: center;
+            padding: 30px 10px;
+        }
+        .logo {
+            width: 80px;
+            height: auto;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+        .judul {
+            font-size: 40px;
+            font-weight: bold;
+            margin: 0;
+            color: #ff4d6d;
+        }
+        .slogan {
+            font-size: 16px;
+            letter-spacing: 2px;
+            margin-top: 5px;
+            color: #4a4a4a;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: #ff8fa3;
+            padding: 15px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        nav a:hover {
+            color: #fff0f3;
+        }
+        .cart-nav {
+            background-color: #ff4d6d;
+            padding: 6px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        /* Banner */
+        .banner {
+            width: 100%;
+            height: 400px;
+            overflow: hidden;
+        }
+        .banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+        .welcome-section {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        /* Filter & Search Bar */
+        .filter-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .search-box input, .filter-box select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+        }
+        .search-box input {
+            width: 250px;
+        }
+
+        /* Product Grid */
+        h2.section-title {
+            text-align: center;
+            margin: 40px 0 20px;
+            position: relative;
+            color: #ff4d6d;
+        }
+        .product-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .produk-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            width: 260px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .produk-card:hover {
+            transform: translateY(-5px);
+        }
+        .produk-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .produk-card h3 {
+            font-size: 16px;
+            margin: 12px 0 5px;
+            height: 40px;
+            overflow: hidden;
+        }
+        .category-badge {
+            background: #fff0f3;
+            color: #ff4d6d;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            align-self: center;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .price {
+            color: #ff4d6d;
+            font-weight: bold;
+            font-size: 18px;
+            margin: 10px 0;
+        }
+        .card-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .btn-secondary {
+            background-color: #f3f4f6;
+            color: #4b5563;
+        }
+        .btn-secondary:hover {
+            background-color: #e5e7eb;
+        }
+
+        /* Button Custom */
+        .button {
+            background-color: #ff758f;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            flex: 1;
+            font-size: 13px;
+            text-align: center;
+        }
+        .button:hover {
+            background-color: #ff4d6d;
+        }
+
+        /* Keranjang Belanja Full Width */
+        .cart-container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-top: 40px;
+        }
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .cart-table th, .cart-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .cart-table th {
+            background-color: #fff0f3;
+            color: #4a4a4a;
+        }
+        .qty-btn {
+            background: #e5e7eb;
+            border: none;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+        .remove-btn {
+            color: #dc2626;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .cart-total {
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #ff4d6d;
+        }
+        
+        /* Opsi Pembayaran Style */
+        .payment-options-container {
+            text-align: right;
+            margin-top: 20px;
+            padding: 15px;
+            background: #fafafa;
+            border-radius: 8px;
+            display: inline-block;
+            float: right;
+            clear: both;
+        }
+        .payment-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #4a4a4a;
+        }
+        .payment-label {
+            margin-left: 15px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .checkout-actions {
+            text-align: right;
+            margin-top: 15px;
+            clear: both;
+        }
+
+        /* Panel Restok Admin Form */
+        .admin-panel-container {
+            background: #fff0f3;
+            border: 2px dashed #ff758f;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 40px;
+        }
+        .admin-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .admin-form input, .admin-form select, .admin-form textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        /* Info Bisnis Visi Misi */
+        .info-box {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .info-box ul {
+            padding-left: 20px;
+            line-height: 1.6;
+        }
+
+        /* Modal Pop-up */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+            text-align: center;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .close-modal {
+            position: absolute;
+            top: 15px; right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #aaa;
+        }
+        .modal img {
+            width: 100%;
+            max-height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        /* Style Khusus Nota / Invoice Pop-up */
+        .nota-box {
+            text-align: left;
+            background: #fff0f3;
+            border: 1px solid #ffcad4;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+
+        /* Kontak */
+        .contact-container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .contact-form input, .contact-form textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Footer */
+        footer {
+            background-color: #ffcad4;
+            text-align: center;
+            padding: 20px;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="logo.png" alt="Logo ViaaStore" class="logo">
+        <h1 class="judul">ViaaStore</h1>
+        <p class="slogan">BORN TO BE LOVED & FUN!</p>
+    </header>
+
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#produk">Produk</a>
+        <a href="#keranjang-section">Keranjang Belanja</a>
+        <a href="#tentang">Tentang Kami</a>
+        <a href="#kontak">Kontak</a>
+        <a href="#keranjang-section" class="cart-nav">🛒 Keranjang (<span id="cart-count">0</span>)</a>
+    </nav>
+
+    <section class="banner" id="home">
+        <img src="banner.jpg" alt="ViaaStore Beauty Banner">
+    </section>
+
+    <div class="container">
+        
+        <section class="welcome-section">
+            <h3>SELAMAT DATANG DI VIAASTORE</h3>
+            <p>Rangkaian kosmetik dan skincare Emina original yang aman, ringan, dan bikin harimu lebih ceria.</p>
+            <a href="#produk" class="button" style="max-width: 200px; margin: 0 auto;">Belanja Sekarang</a>
+        </section>
+
+        <hr>
+
+        <h2 class="section-title" id="produk">BEST SELLER</h2>
+        
+        <div class="filter-container">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Cari produk Emina favoritmu..." onkeyup="filterProducts()">
+            </div>
+            <div class="filter-box">
+                <select id="categoryFilter" onchange="filterProducts()">
+                    <option value="all">Semua Kategori</option>
+                    <option value="Lip Care">Lip Care & Tint</option>
+                    <option value="Face Care">Face Care</option>
+                    <option value="Makeup">Makeup Series</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="product-grid" id="productGrid">
+            <!-- Produk 1 -->
+            <div class="produk-card" data-nama="emina glossy stain autumn bell" data-kategori="Lip Care">
+                <div>
+                    <span class="category-badge">Lip Care</span>
+                    <img src="emina1.jpg" alt="Emina Glossy Stain Autumn Bell" onclick="showProductDetail('Emina Glossy Stain Autumn Bell', '48.000', 'emina1.jpg', 'Lip tint dengan hasil akhir glossy yang cantik tanpa membuat bibir terasa berminyak. Warna Autumn Bell memberikan kesan maron anggun yang tahan lama.')">
+                    <h3>Emina Glossy Stain Autumn Bell</h3>
+                    <p class="price">Rp48.000</p>
+                </div>
+                <div class="card-buttons">
+                    <button class="button btn-secondary" onclick="showProductDetail('Emina Glossy Stain Autumn Bell', '48.000', 'emina1.jpg', 'Lip tint dengan hasil akhir glossy yang cantik tanpa membuat bibir terasa berminyak. Warna Autumn Bell memberikan kesan maron anggun yang tahan lama.')">Detail</button>
+                    <button class="button" onclick="addToCart('Emina Glossy Stain Autumn Bell', 48000)">+ Keranjang</button>
+                </div>
+            </div>
+
+            <!-- Produk 2 -->
+            <div class="produk-card" data-nama="emina sun battle spf 30" data-kategori="Face Care">
+                <div>
+                    <span class="category-badge">Face Care</span>
+                    <img src="emina2.jpg" alt="Emina Sun Battle SPF 30" onclick="showProductDetail('Emina Sun Battle SPF 30', '32.500', 'emina2.jpg', 'Sunscreen dengan tekstur ringan yang siap melindungi kulitmu dari paparan sinar UV. Diperkaya dengan Aloe Vera extract untuk kesegaran ekstra.')">
+                    <h3>Emina Sun Battle SPF 30</h3>
+                    <p class="price">Rp32.500</p>
+                </div>
+                <div class="card-buttons">
+                    <button class="button btn-secondary" onclick="showProductDetail('Emina Sun Battle SPF 30', '32.500', 'emina2.jpg', 'Sunscreen dengan tekstur ringan yang siap melindungi kulitmu dari paparan sinar UV. Diperkaya dengan Aloe Vera extract untuk kesegaran ekstra.')">Detail</button>
+                    <button class="button" onclick="addToCart('Emina Sun Battle SPF 30', 32500)">+ Keranjang</button>
+                </div>
+            </div>
+
+            <!-- Produk 3 -->
+            <div class="produk-card" data-nama="emina bright stuff face wash" data-kategori="Face Care">
+                <div>
+                    <span class="category-badge">Face Care</span>
+                    <img src="emina3.jpg" alt="Emina Bright Stuff Face Wash" onclick="showProductDetail('Emina Bright Stuff Face Wash', '28.000', 'emina3.jpg', 'Sabun pembersih wajah dengan kandungan ekstrak summer plum yang efektif mencerahkan dan melembapkan kulit wajah remaja.')">
+                    <h3>Emina Bright Stuff Face Wash</h3>
+                    <p class="price">Rp28.000</p>
+                </div>
+                <div class="card-buttons">
+                    <button class="button btn-secondary" onclick="showProductDetail('Emina Bright Stuff Face Wash', '28.000', 'emina3.jpg', 'Sabun pembersih wajah dengan kandungan ekstrak summer plum yang efektif mencerahkan dan melembapkan kulit wajah remaja.')">Detail</button>
+                    <button class="button" onclick="addToCart('Emina Bright Stuff Face Wash', 28000)">+ Keranjang</button>
+                </div>
+            </div>
+
+            <!-- Produk 4 -->
+            <div class="produk-card" data-nama="emina daily matte loose powder" data-kategori="Makeup">
+                <div>
+                    <span class="category-badge">Makeup Series</span>
+                    <img src="emina4.jpg" alt="Emina Daily Matte Loose Powder" onclick="showProductDetail('Emina Daily Matte Loose Powder', '38.000', 'emina4.jpg', 'Bedak tabur sehari-hari dengan oil control yang terasa ringan di kulit. Membuat wajah terlihat matte, segar, dan bebas kilap seharian.')">
+                    <h3>Emina Daily Matte Loose Powder</h3>
+                    <p class="price">Rp38.000</p>
+                </div>
+                <div class="card-buttons">
+                    <button class="button btn-secondary" onclick="showProductDetail('Emina Daily Matte Loose Powder', '38.000', 'emina4.jpg', 'Bedak tabur sehari-hari dengan oil control yang terasa ringan di kulit. Membuat wajah terlihat matte, segar, dan bebas kilap seharian.')">Detail</button>
+                    <button class="button" onclick="addToCart('Emina Daily Matte Loose Powder', 38000)">+ Keranjang</button>
+                </div>
+            </div>
+
+            <!-- Produk 5 -->
+            <div class="produk-card" data-nama="emina cheek lit cream blush" data-kategori="Makeup">
+                <div>
+                    <span class="category-badge">Makeup Series</span>
+                    <img src="emina5.jpg" alt="Emina Cheek Lit Cream Blush" onclick="showProductDetail('Emina Cheek Lit Cream Blush', '35.000', 'emina5.jpg', 'Perona pipi bertekstur krim dengan teknologi color-enhance, memberikan hasil rona pink alami yang menyatu sempurna di kulit wajah.')">
+                    <h3>Emina Cheek Lit Cream Blush</h3>
+                    <p class="price">Rp35.000</p>
+                </div>
+                <div class="card-buttons">
+                    <button class="button btn-secondary" onclick="showProductDetail('Emina Cheek Lit Cream Blush', '35.000', 'emina5.jpg', 'Perona pipi bertekstur krim dengan teknologi color-enhance, memberikan hasil rona pink alami yang menyatu sempurna di kulit wajah.')">Detail</button>
+                    <button class="button" onclick="addToCart('Emina Cheek Lit Cream Blush', 35000)">+ Keranjang</button>
+                </div>
+            </div>
+
+            <!-- Produk 6 -->
+            <div class="produk-card" data-nama="emina lip mask vanilla" data-kategori="Lip Care">
+                <div>
+                    <span class="category-badge">Lip Care</span>
+                    <img src="emina6.jpg" alt="Emina Lip Mask Vanilla" onclick="showProductDetail('Emina Lip Mask Vanilla', '40.000', 'emina6.jpg', 'Masker bibir dengan aroma vanilla manis. Mengandung 7 natural oils yang menutrisi dan mengurangi sel kulit mati saat kamu tidur.')">
+                    <h3>Emina Lip Mask Vanilla</h3>
+                    <p class="price">Rp40.000</p>
+                </div>
+                <div class="card-buttons">
+                    <button class="button btn-secondary" onclick="showProductDetail('Emina Lip Mask Vanilla', '40.000', 'emina6.jpg', 'Masker bibir dengan aroma vanilla manis. Mengandung 7 natural oils yang menutrisi dan mengurangi sel kulit mati saat kamu tidur.')">Detail</button>
+                    <button class="button" onclick="addToCart('Emina Lip Mask Vanilla', 40000)">+ Keranjang</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bagian Keranjang Belanja -->
+        <div class="cart-container" id="keranjang-section">
+            <h3>🛒 Keranjang Belanja Anda</h3>
+            <div id="cartEmptyMessage" style="color: #888; padding: 15px 0; text-align: center;">Keranjang belanja Anda masih kosong. Silakan pilih produk di atas.</div>
+            
+            <table class="cart-table" id="cartTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Produk</th>
+                        <th>Harga</th>
+                        <th>Jumlah</th>
+                        <th>Total</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="cartItems"></tbody>
+            </table>
+            
+            <div class="cart-total" id="cartTotalContainer" style="display: none;">
+                Total Pembayaran: <span id="cartTotalPrice">Rp0</span>
+            </div>
+
+            <!-- OPSI PILIHAN PEMBAYARAN COD / TRANSFER -->
+            <div class="payment-options-container" id="paymentOptionsContainer" style="display: none;">
+                <div class="payment-title">Pilih Metode Pembayaran:</div>
+                <label class="payment-label">
+                    <input type="radio" name="metodePembayaran" value="COD (Bayar di Tempat)" checked> COD (Bayar di Tempat)
+                </label>
+                <label class="payment-label">
+                    <input type="radio" name="metodePembayaran" value="Transfer Bank"> Transfer Bank
+                </label>
+            </div>
+            
+            <div class="checkout-actions" id="checkoutActionContainer" style="display: none;">
+                <button onclick="prosesCheckoutLokal()" class="button" style="font-size: 16px; padding: 12px 25px; max-width: 350px;">Selesaikan Pesanan Sekarang 🚀</button>
+            </div>
+        </div>
+
+        <!-- PANEL RESTOK BARANG (ADMIN ONLY) -->
+        <div class="admin-panel-container">
+            <h3>⚙️ Panel Restok Produk (Khusus Admin)</h3>
+            <p style="font-size: 13px; color: #666; margin-top: -5px;">Gunakan panel ini untuk menambah varian kosmetik baru langsung ke galeri di atas secara instan.</p>
+            
+            <div class="admin-form">
+                <input type="text" id="adminNama" placeholder="Nama Produk Baru (Contoh: Emina Lip Tint Cherry)">
+                <input type="number" id="adminHarga" placeholder="Harga Jual (Contoh: 45000)">
+                <select id="adminKategori">
+                    <option value="Lip Care">Lip Care & Tint</option>
+                    <option value="Face Care">Face Care</option>
+                    <option value="Makeup">Makeup Series</option>
+                </select>
+                <input type="text" id="adminGambar" placeholder="Nama File Gambar (Contoh: emina7.jpg)">
+            </div>
+            <div style="margin-top: 15px;">
+                <textarea id="adminDeskripsi" placeholder="Tuliskan deskripsi detail produk di sini untuk pop-up pelanggan..." rows="3"></textarea>
+            </div>
+            <button onclick="prosesRestok()" class="button" style="margin-top: 15px; background-color: #ff4d6d; max-width: 250px;">💾 Masukkan ke Katalog Toko</button>
+        </div>
+
+        <div class="info-box" id="tentang">
+            <h3>🎯 Visi & Misi Toko</h3>
+            <p><strong>Visi:</strong> Menjadi penyedia produk kosmetik terbaik yang mendukung kreativitas, rasa percaya diri, dan kecantikan alami remaja melalui brand Emina di Indonesia.</p>
+            <p><strong>Misi:</strong></p>
+            <ul>
+                <li>Menghadirkan produk kosmetik dan skincare original, aman, dan berkualitas dengan pelayanan terbaik.</li>
+                <li>Membantu pelanggan menemukan produk kecantikan yang paling pas dengan tipe dan kebutuhan kulit mereka.</li>
+                <li>Menjamin transaksi belanja e-commerce yang cepat, transparan, dan terpercaya di platform ViaaStore.</li>
+            </ul>
+
+            <br>
+            <h3>🏢 Tentang Kami (ViaaStore - Sarqh.Id)</h3>
+            <p><strong>ViaaStore</strong> (Sarqh.Id) adalah platform belanja kosmetik terintegrasi untuk melengkapi kebutuhan produk kecantikan harianmu. Sebagai prototipe e-commerce modern, sistem ini dirancang untuk memaksimalkan User Experience serta kemudahan manajemen inventori secara dinamis.</p>
+        </div>
+
+        <div class="contact-container" id="kontak">
+            <h2>📞 Hubungi Kami</h2>
+            <p>📍 Alamat Resmi: jln.Cibeunying No23</p>
+            <p>💬 WhatsApp Fast Respon: 083829209892</p>
+
+            <form class="contact-form" onsubmit="alert('Pesan Anda berhasil terkirim! Tim Customer Service kami akan membalas via email secepatnya.'); this.reset(); return false;">
+                <input type="text" placeholder="Nama Lengkap" required>
+                <input type="email" placeholder="Email Aktif" required>
+                <textarea placeholder="Tulis pertanyaan Anda di sini..." rows="4" required></textarea>
+                <button type="submit" class="button" style="max-width: 200px;">Kirim Pesan</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Detail Produk -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <img id="modalImg" src="" alt="Detail Produk">
+            <h3 id="modalTitle"></h3>
+            <p id="modalPrice" style="color: #ff4d6d; font-weight: bold; font-size: 20px;"></p>
+            <p id="modalDesc" style="text-align: justify; font-size: 14px; color: #555; line-height: 1.5; margin: 15px 0;"></p>
+            <button class="button" id="modalAddToCartBtn">Masukkan Keranjang</button>
+        </div>
+    </div>
+
+    <!-- Modal Invoice / Nota Sukses Pembayaran -->
+    <div id="invoiceModal" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <span class="close-modal" onclick="closeInvoiceModal()">&times;</span>
+            <h3 style="color: #ff4d6d; margin-bottom: 5px;">🎉 Pesanan Berhasil Dibuat!</h3>
+            <p style="font-size: 13px; color: #666; margin-top: 0;">Silakan simpan ringkasan transaksi berikut ini.</p>
+            
+            <div class="nota-box" id="notaContent"></div>
+            
+            <p id="instruksiPembayaran" style="font-size: 13px; font-weight: bold; padding: 10px; background: #fffbeb; border-left: 4px solid #ff758f; text-align: left; border-radius: 4px;"></p>
+            <button class="button" onclick="closeInvoiceModal()" style="margin-top: 15px; background-color: #ff4d6d; width: 100%;">Selesai & Tutup</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Sarqh.Id - ViaaStore. All Rights Reserved.</p>
+    </footer>
+
+    <!-- LOGIKA JAVASCRIPT LENGKAP -->
+    <script>
+        let cart = [];
+
+        // 1. Tambah ke Keranjang
+        function addToCart(nama, harga) {
+            let itemTerpilih = cart.find(item => item.nama === nama);
+
+            if (itemTerpilih) {
+                itemTerpilih.jumlah++;
+            } else {
+                cart.push({ nama: nama, harga: harga, jumlah: 1 });
+            }
+
+            if (typeof trackCartEvent === 'function') {
+                trackCartEvent('Add to Cart', nama);
+            }
+
+            updateCartUI();
+        }
+
+        // 2. Tampilkan & Perbarui Tampilan Keranjang
+        function updateCartUI() {
+            const cartCount = document.getElementById('cart-count');
+            const cartEmptyMessage = document.getElementById('cartEmptyMessage');
+            const cartTable = document.getElementById('cartTable');
+            const cartItems = document.getElementById('cartItems');
+            const cartTotalContainer = document.getElementById('cartTotalContainer');
+            const cartTotalPrice = document.getElementById('cartTotalPrice');
+            const paymentOptionsContainer = document.getElementById('paymentOptionsContainer');
+            const checkoutActionContainer = document.getElementById('checkoutActionContainer');
+
+            let totalQty = cart.reduce((sum, item) => sum + item.jumlah, 0);
+            cartCount.innerText = totalQty;
+
+            if (cart.length === 0) {
+                cartEmptyMessage.style.display = 'block';
+                cartTable.style.display = 'none';
+                cartTotalContainer.style.display = 'none';
+                paymentOptionsContainer.style.display = 'none';
+                checkoutActionContainer.style.display = 'none';
+                return;
+            }
+
+            cartEmptyMessage.style.display = 'none';
+            cartTable.style.display = 'table';
+            cartTotalContainer.style.display = 'block';
+            paymentOptionsContainer.style.display = 'inline-block';
+            checkoutActionContainer.style.display = 'block';
+
+            cartItems.innerHTML = '';
+            let totalBelanja = 0;
+
+            cart.forEach((item, index) => {
+                let subtotal = item.harga * item.jumlah;
+                totalBelanja += subtotal;
+
+                let row = `
+                    <tr>
+                        <td><strong>${item.nama}</strong></td>
+                        <td>Rp${item.harga.toLocaleString('id-ID')}</td>
+                        <td>
+                            <button class="qty-btn" onclick="changeQty(${index}, -1)">-</button>
+                            <span style="margin: 0 5px;">${item.jumlah}</span>
+                            <button class="qty-btn" onclick="changeQty(${index}, 1)">+</button>
+                        </td>
+                        <td>Rp${subtotal.toLocaleString('id-ID')}</td>
+                        <td>
+                            <button class="remove-btn" onclick="removeFromCart(${index})">❌ Hapus</button>
+                        </td>
+                    </tr>
+                `;
+                cartItems.innerHTML += row;
+            });
+
+            cartTotalPrice.innerText = 'Rp' + totalBelanja.toLocaleString('id-ID');
+        }
+
+        // 3. Atur Jumlah Qty
+        function changeQty(index, delta) {
+            cart[index].jumlah += delta;
+            if (cart[index].jumlah <= 0) {
+                cart.splice(index, 1);
+            }
+            updateCartUI();
+        }
+
+        // 4. Hapus Item dari Keranjang
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        // 5. Fungsi Filter Pencarian dan Kategori Produk
+        function filterProducts() {
+            let searchVal = document.getElementById('searchInput').value.toLowerCase();
+            let categoryVal = document.getElementById('categoryFilter').value;
+            let products = document.getElementsByClassName('produk-card');
+
+            for (let i = 0; i < products.length; i++) {
+                let pNama = products[i].getAttribute('data-nama').toLowerCase();
+                let pKategori = products[i].getAttribute('data-kategori');
+
+                let matchSearch = pNama.includes(searchVal);
+                let matchCategory = (categoryVal === 'all' || pKategori === categoryVal);
+
+                if (matchSearch && matchCategory) {
+                    products[i].style.display = 'flex';
+                } else {
+                    products[i].style.display = 'none';
+                }
+            }
+        }
+
+        // 6. Modal Detail Produk
+        function showProductDetail(nama, harga, imgUrl, deskripsi) {
+            document.getElementById('modalImg').src = imgUrl;
+            document.getElementById('modalTitle').innerText = nama;
+            document.getElementById('modalPrice').innerText = 'Rp' + harga;
+            document.getElementById('modalDesc').innerText = deskripsi;
+            
+            // Konversi harga string ke number (ex: '48.000' -> 48000)
+            let hargaNum = parseInt(harga.replace(/\./g, ''));
+            document.getElementById('modalAddToCartBtn').onclick = function() {
+                addToCart(nama, hargaNum);
+                closeModal();
+            };
+
+            document.getElementById('productModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('productModal').style.display = 'none';
+        }
+
+        // 7. Proses Checkout & Tampilkan Invoice Modal
+        function prosesCheckoutLokal() {
+            let metode = document.querySelector('input[name="metodePembayaran"]:checked').value;
+            let totalBelanja = 0;
+            let notaTeks = `===============================\n`;
+            notaTeks += `          VIAASTORE            \n`;
+            notaTeks += `===============================\n`;
+            
+            cart.forEach(item => {
+                let sub = item.harga * item.jumlah;
+                totalBelanja += sub;
+                notaTeks += `${item.nama}\n`;
+                notaTeks += `  ${item.jumlah}x Rp${item.harga.toLocaleString('id-ID')} = Rp${sub.toLocaleString('id-ID')}\n`;
+            });
+
+            notaTeks += `-------------------------------\n`;
+            notaTeks += `TOTAL      : Rp${totalBelanja.toLocaleString('id-ID')}\n`;
+            notaTeks += `METODE PAY : ${metode}\n`;
+            notaTeks += `===============================\n`;
+            notaTeks += `Terima kasih telah berbelanja!`;
+
+            document.getElementById('notaContent').innerText = notaTeks;
+
+            let instruksi = "";
+            if (metode === "Transfer Bank") {
+                instruksi = "Silakan transfer ke REK BCA: 1234-567-890 a/n VIAASTORE dan kirim bukti ke WA.";
+            } else {
+                instruksi = "Siapkan uang pas saat kurir mengantar barang ke alamat Anda.";
+            }
+            document.getElementById('instruksiPembayaran').innerText = instruksi;
+
+            // Tampilkan Modal Invoice
+            document.getElementById('invoiceModal').style.display = 'flex';
+            
+            // Reset Keranjang Belanja setelah checkout sukses
+            cart = [];
+            updateCartUI();
+        }
+
+        function closeInvoiceModal() {
+            document.getElementById('invoiceModal').style.display = 'none';
+        }
+
+        // 8. Panel Admin Restok Tambah Produk Baru
+        function prosesRestok() {
+            let nama = document.getElementById('adminNama').value;
+            let harga = parseInt(document.getElementById('adminHarga').value);
+            let kategori = document.getElementById('adminKategori').value;
+            let gambar = document.getElementById('adminGambar').value || 'logo.png';
+            let deskripsi = document.getElementById('adminDeskripsi').value || 'Deskripsi produk baru.';
+
+            if (!nama || !harga) {
+                alert('Nama produk dan harga wajib diisi!');
+                return;
+            }
+
+            let grid = document.getElementById('productGrid');
+            let cardBaru = document.createElement('div');
+            cardBaru.className = 'produk-card';
+            cardBaru.setAttribute('data-nama', nama.toLowerCase());
+            cardBaru.setAttribute('data-kategori', kategori);
+
+            cardBaru.innerHTML = `
+                <div>
+                    <span class="category-badge">${kategori}</span>
+                    <img src="${gambar}" alt="${nama}" onclick="showProductDetail('${nama}', '${harga.toLocaleString('id-ID')}', '${gambar}', '${deskripsi}')">
+                    <h3>${nama}</h3>
+                    <p class="price">Rp${harga.toLocaleString('id-ID')}</p>
+                </div>
+                <div class="card-buttons">
+                    <button class="button btn-secondary" onclick="showProductDetail('${nama}', '${harga.toLocaleString('id-ID')}', '${gambar}', '${deskripsi}')">Detail</button>
+                    <button class="button" onclick="addToCart('${nama}', ${harga})">+ Keranjang</button>
+                </div>
+            `;
+
+            grid.appendChild(cardBaru);
+            alert(`Produk "${nama}" berhasil dimasukkan ke katalog toko!`);
+            
+            // Reset input form
+            document.getElementById('adminNama').value = '';
+            document.getElementById('adminHarga').value = '';
+            document.getElementById('adminGambar').value = '';
+            document.getElementById('adminDeskripsi').value = '';
+        }
+
+        // Menutup modal jika user klik area luar konten modal
+        window.onclick = function(event) {
+            let pModal = document.getElementById('productModal');
+            let iModal = document.getElementById('invoiceModal');
+            if (event.target == pModal) {
+                pModal.style.display = "none";
+            }
+            if (event.target == iModal) {
+                iModal.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
